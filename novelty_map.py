@@ -1,26 +1,31 @@
 #!/usr/env/bin python3
-class Novelty_map(list):
+import networkx as nx
+
+
+class novelty_map(nx.Graph):
     def __init__(self,max_population):
         self.max_population = max_population
-        self.min_distance_ever = list()
         super().__init__()
 
     def append(self,new):
-        if not hasattr(new,'distance'):
-            raise "new element has no distance method"
-
-        news_distance_for_each = [new.distance(e) for e in self]
-        new_min_distance = min(news_distance_for_each)
-
+        new_distances = [new.distance(n) for n in self.nodes()]
         if len(self) < self.max_population:
-            super().append(new)
-            self.min_distance_ever.append(new_min_distance)
+            self.add_node(new)
+            self.add_weighted_edges_from([(new,n,dist) for n,dist in zip(self.nodes(),new_distances)])#zip() iterates shortest times
 
-        elif new_min_distance > min(self.min_distance_ever):
-            #delete the element which has minimum_distance
-            min_index = self.min_distance_ever.index(min(self.min_distance_ever))
-            del self[min_index]
-            del self.min_distance_ever[min_index]
-            #append a new element and minimum distance
-            self.append(new)
-            self.append
+
+if __name__ == '__main__':
+    class test_gene(int):
+        def distance(self,other):
+            return 0
+    nm = novelty_map(10)
+    nm.append(test_gene(1))
+    nm.append(test_gene(2))
+    nm.append(test_gene(3))
+
+    pos = nx.shell_layout(nm)
+    nx.draw_networkx_nodes(nm,pos)
+    nx.draw_networkx_edges(nm,pos)
+    nx.draw_networkx_edge_labels(nm,pos)
+    import matplotlib.pyplot as plt
+    plt.show()
