@@ -1,4 +1,5 @@
 #!/usr/env/bin python3
+from novelty_map import novelty_map
 
 class SUNA:
     def __init__(self, initial_mutations, step_mutations, population_size, maximum_novelty_map_population, mutation_probability_array, neuromodulation_probability, control_neuron_probability, excitation_threshold):
@@ -18,20 +19,22 @@ class SUNA:
         assert all([0 <= probability <= 1 for probability in list(mutation_probability_array)+[neuromodulation_probability, control_neuron_probability]), "Probability must be 0 <= prob <= 1"
 
         #initial mutations
+        self.genes
 
-
-    def generator(self,number_of_iteration):
-        for n in range(number_of_iteration):
-            #evaluation
-            yield self.generate_individuals()
-            #selection
-            self.selection()
-            #reproduction
-            self.reproduction()
 
     def generate_individuals(self):
-        for gene in genes:
-            yield individual(gene)
+        nov_map = novelty_map()
+
+        for gene in self.genes:
+            ind = individual(gene)
+            yield ind
+            gene.fitness = ind.fitness
+            nov_map.append(gene)
+
+        self.mutation(nov_map.nodes())
+
+    def mutation(self,genes):
+        pass
 
 if __name__ == '__main__':
     I_m = 200
@@ -46,7 +49,7 @@ if __name__ == '__main__':
     suna = SUNA(I_m, S_m, lenP, Max_n, M_pa, Neuromodulation_P, Control_neuron_P, Excitation_threshold)
 
     iteration = 5
-    for generation in suna.generator(iteration):
+    for g in range(iteration):
         for individual in generation:
             #evaluation
 
