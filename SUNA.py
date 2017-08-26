@@ -1,8 +1,13 @@
 #!/usr/env/bin python3
 from novelty_map import novelty_map
+from chromosome import chromosome
+
+
 
 class SUNA:
-    def __init__(self, initial_mutations, step_mutations, population_size, maximum_novelty_map_population, mutation_probability_array, neuromodulation_probability, control_neuron_probability, excitation_threshold):
+    def __init__(self, number_of_inputs, number_of_outputs,
+        initial_mutations = 200, step_mutations = 5, populatio_size = 100, novelty_map_population = 20, mutation_probability_array = (.01,.01,.49,.49),
+        neuromodulation_probability = .1, control_neuron_probability = .2, excitation_threshold = 0):
         """
         initial_mutations                   :
         step_mutations                      :
@@ -18,14 +23,14 @@ class SUNA:
         assert len(mutation_probability_array) == 4, "mutation_probability_array(M_pa) length must be 4"
         assert all([0 <= probability <= 1 for probability in list(mutation_probability_array)+[neuromodulation_probability, control_neuron_probability]), "Probability must be 0 <= prob <= 1"
 
-        #initial mutations
-        self.genes
+        #first generation
+        self.population = [chromosome(number_of_inputs, number_of_outputs, mutation_probability_array).mutation(initial_mutations) for _ in range(population_size)]
 
 
     def generate_individuals(self):
         nov_map = novelty_map()
 
-        for gene in self.genes:
+        for gene in self.population:
             ind = individual(gene)
             yield ind
             gene.fitness = ind.fitness
@@ -33,20 +38,12 @@ class SUNA:
 
         self.mutation(nov_map.nodes())
 
-    def mutation(self,genes):
+    def mutation(self,selected):
         pass
 
-if __name__ == '__main__':
-    I_m = 200
-    S_m = 5
-    lenP = 100
-    Max_n = 20
-    M_pa = (.01, .01, .49, .49)
-    Neuromodulation_P = .1
-    Control_neuron_P = .2
-    Excitation_threshold = .0
 
-    suna = SUNA(I_m, S_m, lenP, Max_n, M_pa, Neuromodulation_P, Control_neuron_P, Excitation_threshold)
+if __name__ == '__main__':
+    suna = SUNA(2,2)
 
     iteration = 5
     for g in range(iteration):
