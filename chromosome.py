@@ -1,7 +1,7 @@
 import random
 from functools import reduce
-from neuron import neuron,identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron,
-                    input_identity_neuron,output_identity_neuron,control_neuron
+#from neuron import neuron,identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron,input_identity_neuron,output_identity_neuron,control_neuron
+from neurons.identity_neuron import identity_neuron
 from gene import neuron_gene, connection_gene
 
 
@@ -26,15 +26,17 @@ class chromosome:
         self.connections = []
         self.control_connections = []
 
-    def mutation(self,steps mutation_probability = None):
+
+    def mutation(self,steps, mutation_probability = None):
         #in > python 3.6
         #random.choices(operations,weights=mutation_probability)
         import numpy
         operations = [self.add_neuron, self.delete_neuron, self.add_connection, self.delete_connection]
         if mutation_probability is None:
             mutation_probability = self.M_pa
-        for _ in range(steps)
+        for _ in range(steps):
             numpy.random.choice(operations, p=mutation_probability)()#operation at random
+
 
     def find_smallest_id(self, neurons_list):
         #find smallest id not used
@@ -76,9 +78,11 @@ class chromosome:
                 if c.from_neuron == delete.id or c.to_neuron == delete.id or c.modulation == delete.id:
                     c_list.remove(c)
         
+
     def add_connection(self):
         all_neurons = self.inputs + self.outputs + self.neurons + self.control_neuron
         add_connection_from_lists(self, all_neurons, all_neurons, all_neurons)
+
 
     def add_connection_from_lists(self, from_list, to_list, modulator_list):
         from_neuron, to_neuron = random.choice(from_list), random.choice(to_list)
@@ -106,3 +110,32 @@ class chromosome:
             if connection in c_list:
                 c_list.remove(connection)
                 break
+
+
+    def make_spectrum(self):
+        """
+        identity
+        sigmoid
+        threshold
+        random
+        control
+        slow
+        """
+        all_neurons = self.inputs + self.outputs + self.neurons + self.control_neurons
+        def count_type(_list,_type):
+            return sum([isinstance(x,_type) for x in _list])
+
+        normal_neuron_nums = [count_type(self.neurons, _type) for _type in (identity_neuron, sigmoid_neuron, threshold_neuron, random_neuron)]
+        control_neuron_num = len(self.control_neurons)
+        slower_neuron_num = sum([x.adaptation_speed > 1 for x in self.neurons+self.control_neurons])
+
+        self.spectrum = normal_neuron_nums + [control_neuron_num, slower_neuron_num]
+
+    def distance(self,other):
+        #l2 norm
+        return pow(sum([(x-y)**2 for x,y in zip(self.spectrum,other.spectrum)]),1/2)
+
+
+if __name__ == '__main__':
+    a,b = [chromosome(3,3,(.2,.2,.3,.3),0,0,0) for _ in range(2)]
+    
