@@ -56,8 +56,8 @@ class chromosome:
                 control_neuron if random.random()<self.control_neuron_probability else random.choice(normal_neurons)
                 )
         #make new connections
-        self.add_connection(all_neurons, [new], all_neurons)
-        self.add_connection([new], all_neurons, all_neurons)
+        self.add_connection_from_lists(all_neurons, [new], all_neurons)
+        self.add_connection_from_lists([new], all_neurons, all_neurons)
 
 
     def delete_neuron(self):
@@ -78,7 +78,7 @@ class chromosome:
         
     def add_connection(self):
         all_neurons = self.inputs + self.outputs + self.neurons + self.control_neuron
-        add_connection_from_ilsts(self, all_neurons, all_neurons, all_neurons)
+        add_connection_from_lists(self, all_neurons, all_neurons, all_neurons)
 
     def add_connection_from_lists(self, from_list, to_list, modulator_list):
         from_neuron, to_neuron = random.choice(from_list), random.choice(to_list)
