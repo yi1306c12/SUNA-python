@@ -1,7 +1,6 @@
 import random
 from functools import reduce
-#from neuron import neuron,identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron,input_identity_neuron,output_identity_neuron,control_neuron
-from neurons.identity_neuron import identity_neuron
+from neurons import identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron,input_identity_neuron,output_identity_neuron,control_neuron
 from gene import neuron_gene, connection_gene
 
 
@@ -17,8 +16,8 @@ class chromosome:
         self.excitation_threshold = excitation_threshold
 
         #fixed interface neurons
-        self.inputs = tuple([neuron_gene(i,1,input_identity_neuron) for i in range(n_inputs)])
-        self.outputs = tuple([neuron_gene(i+n_inputs,1,output_identity_neuron) for i in range(n_outputs)])
+        self.inputs = list([neuron_gene(i,1,input_identity_neuron) for i in range(n_inputs)])
+        self.outputs = list([neuron_gene(i+n_inputs,1,output_identity_neuron) for i in range(n_outputs)])
 
         self.neurons = []
         self.control_neurons = []
@@ -41,7 +40,7 @@ class chromosome:
     def find_smallest_id(self, neurons_list):
         #find smallest id not used
         neuron_ids = [n.id for n in neurons_list]
-        remain_ids = list(range(len(all_neurons))).difference(all_neurons_id)
+        remain_ids = list(set(range(len(neurons_list))) - set(neuron_ids))
         if len(remain_ids) > 0:
             remain_ids.sort()
             return remain_ids[0]
@@ -60,7 +59,11 @@ class chromosome:
         #make new connections
         self.add_connection_from_lists(all_neurons, [new], all_neurons)
         self.add_connection_from_lists([new], all_neurons, all_neurons)
-
+        #add new to list
+        if isinstance(new,control_neuron):
+            self.control_neurons.append(new)
+        else:
+            self.neurons.append(new)
 
     def delete_neuron(self):
         if len(self.neurons + self.control_neurons) == 0:
@@ -77,16 +80,16 @@ class chromosome:
             for c in c_list:
                 if c.from_neuron == delete.id or c.to_neuron == delete.id or c.modulation == delete.id:
                     c_list.remove(c)
-        
+
 
     def add_connection(self):
-        all_neurons = self.inputs + self.outputs + self.neurons + self.control_neuron
-        add_connection_from_lists(self, all_neurons, all_neurons, all_neurons)
+        all_neurons = self.inputs + self.outputs + self.neurons + self.control_neurons
+        self.add_connection_from_lists(all_neurons, all_neurons, all_neurons)
 
 
     def add_connection_from_lists(self, from_list, to_list, modulator_list):
         from_neuron, to_neuron = random.choice(from_list), random.choice(to_list)
-        
+
         if random.random() < self.neuromodulation_probability:
             modulator = random.choice(modulator_list)
             new_connection = connection_gene(from_neuron.id, to_neuron.id, 1, modulator.id)
@@ -102,7 +105,7 @@ class chromosome:
 
     def delete_connection(self):
         connections_lists = [self.connections, self.control_connections]
-        if len(connections_lists) == 0:
+        if sum([len(c_list) for c_list in connections_lists]) == 0:
             return#guard
 
         connection = random.choice(reduce(lambda x,y:x+y, connections_lists))
@@ -121,7 +124,6 @@ class chromosome:
         control
         slow
         """
-        all_neurons = self.inputs + self.outputs + self.neurons + self.control_neurons
         def count_type(_list,_type):
             return sum([isinstance(x,_type) for x in _list])
 
@@ -138,4 +140,11 @@ class chromosome:
 
 if __name__ == '__main__':
     a,b = [chromosome(3,3,(.2,.2,.3,.3),0,0,0) for _ in range(2)]
-    
+    a.make_spectrum()
+    print(a.spectrum)
+
+    a.mutation(200,mutation_probability=(.1,0,.5,.4))
+    a.make_spectrum()
+    print(a.spectrum)
+    print(len(a.neurons))
+    print(len(a.connections))
