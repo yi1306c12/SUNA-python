@@ -1,3 +1,5 @@
+#This file should be divided in .py of each classes
+
 class neuron_gene:
 
     def __init__(self, identical_number, adaptation_speed, neuron_type):
@@ -7,6 +9,14 @@ class neuron_gene:
 
     def generate_phenotype(self, **keyargs):
         return self.type(self.id, self.adaptation_speed, **keyargs)
+
+
+class connection_gene:
+    def __init__(self, from_neuron_id, to_neuron_id, weight, modulation_id=-1):
+        self.from_neuron = from_neuron_id
+        self.to_neuron = to_neuron_id
+        self.weight = weight
+        self.modulation = modulation_id
 
 
 if __name__ == '__main__':
