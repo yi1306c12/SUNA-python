@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 
 class neuron(metaclass=ABCMeta):
-
+    excitation = 0.
     def __init__(self, identical_number, adaptation_speed, initial_state = 0.):
         self.id = identical_number
         self.adaptation_speed = adaptation_speed
