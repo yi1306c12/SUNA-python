@@ -13,6 +13,10 @@ class neuron(metaclass=ABCMeta):
         self.internal_state += (self.activation(x) - self.internal_state)/self.adaptation_speed
         return self.internal_state
 
+    def get_internal_state(self):
+        return self.internal_state
+
+
     @abstractmethod
     def activation(self, x):
         pass
@@ -50,7 +54,8 @@ class control_neuron(threshold_neuron):
 
 
 class input_neuron:
-    pass
+    def set_internal_state(self,state):
+        self.internal_state = state
 
 
 class input_identity_neuron(input_neuron,identity_neuron):
@@ -63,3 +68,10 @@ class output_neuron:
 
 class output_identity_neuron(output_neuron, identity_neuron):
     pass
+
+    
+if __name__ == "__main__":
+    #test input_neuron
+    iin = input_identity_neuron(0, 1)
+    iin.set_internal_state(1)
+    print(iin.get_internal_state())

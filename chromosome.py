@@ -9,11 +9,10 @@ firing_rate_levels = [1,7,49]
 
 
 class chromosome:
-    def __init__(self, n_inputs, n_outputs, M_pa, neuromodulation_probability, control_neuron_probability, excitation_threshold):
+    def __init__(self, n_inputs, n_outputs, M_pa, neuromodulation_probability, control_neuron_probability):
         """M_pa = (add node, add connection, delete node, delete connection)"""
         self.M_pa = M_pa
         self.neuromodulation_probability, self.control_neuron_probability = neuromodulation_probability, control_neuron_probability
-        self.excitation_threshold = excitation_threshold
 
         #fixed interface neurons
         self.inputs = list([neuron_gene(i,1,input_identity_neuron) for i in range(n_inputs)])
