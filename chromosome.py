@@ -7,6 +7,8 @@ from gene import neuron_gene, connection_gene
 normal_neurons = [identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron]
 firing_rate_levels = [1,7,49]
 
+import networkx as nx
+import matplotlib.pyplot as plt
 
 class chromosome:
     def __init__(self, n_inputs, n_outputs, M_pa, neuromodulation_probability, control_neuron_probability):
@@ -132,17 +134,35 @@ class chromosome:
 
         self.spectrum = normal_neuron_nums + [control_neuron_num, slower_neuron_num]
 
+
     def distance(self,other):
         #l2 norm
         return pow(sum([(x-y)**2 for x,y in zip(self.spectrum,other.spectrum)]),1/2)
 
 
+    def generate_graph(self):
+        network = nx.DiGraph()
+        network.add_nodes_from([n.id for n in self.inputs+self.outputs+self.neurons+self.control_neurons])
+        node_colors = ['blue']*len(self.inputs) + ['red']*len(self.outputs) + ['green']*len(self.neurons) + ['yellow']*len(self.control_neurons)
+        print(node_colors)
+
+        for c in self.connections+self.control_connections:
+            network.add_edge(c.from_neuron_id,c.to_neuron_id,weight=c.weight)
+        print(nx.get_edge_attributes(network,'weight'))
+        pos = nx.spring_layout(network)
+        nx.draw(network, pos ,with_labels=True,node_color=node_colors,)
+        #nx.draw_networkx_edge_labels(network,pos)
+        plt.show()       
+
+
 if __name__ == '__main__':
-    a,b = [chromosome(3,3,(.2,.2,.3,.3),0,0,0) for _ in range(2)]
+    a,b = [chromosome(3,3,(.2,.2,.3,.3),0,0) for _ in range(2)]
     a.make_spectrum()
     print(a.spectrum)
 
-    a.mutation(200,mutation_probability=(.1,0,.5,.4))
+    a.mutation(10,mutation_probability=(.1,0,.5,.4))
+    a.generate_graph()
+
     a.make_spectrum()
     print(a.spectrum)
     print(len(a.neurons))
