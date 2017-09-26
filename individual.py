@@ -1,5 +1,3 @@
-import numpy as np
-
 from neurons import control_neuron
 
 class individual:
