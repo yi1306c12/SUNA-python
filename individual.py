@@ -36,11 +36,12 @@ class individual:
             if connection.to_neuron_id != neuron.id : continue#guard
 
             #is not control_neuron?
-            source_neuron = self.neuron_dict[connection.to_neuron_id]
+            source_neuron = self.neuron_dict[connection.from_neuron_id]
             if isinstance(source_neuron, control_neuron) : continue#guard
 
             #no modulation
             if connection.modulation < 0:
+#                print('input from', source_neuron.id, source_neuron.get_internal_state())
                 _input = connection.weight * source_neuron.get_internal_state()
             #neuromodulation
             else:
@@ -51,7 +52,7 @@ class individual:
             all_input_sum += _input
 
         #update internal state
-        print(neuron.id,all_input_sum)
+#        print(neuron.id,all_input_sum)
         return neuron(all_input_sum + addition)
 
 
@@ -76,8 +77,8 @@ class individual:
 
 #input neurons
         for input_neuron, s in zip(self.input_neurons, observation):
-            #self.execute(input_neuron, addition=s)
-            print('inputs :',self.execute(input_neuron,addition=s),input_neuron.get_internal_state())
+            self.execute(input_neuron, addition=s)
+#            print('inputs :',self.execute(input_neuron,addition=s),input_neuron.get_internal_state())
 
 #primer neurons
         for primer_neuron in self.primer_neurons:
@@ -101,7 +102,6 @@ class individual:
             
 #normal neurons
         remaining_neurons = [n for n in self.neurons if n.excitation >= self.EXCITATION_THRESHOLD] + self.output_neurons
-        print(remaining_neurons)
         while True:
             activated_neurons = []
             for tested_neuron in remaining_neurons:
@@ -115,7 +115,8 @@ class individual:
         #output neurons should be activated anyway
         for remained_neuron in remaining_neurons:
             if remained_neuron in self.output_neurons:
-                print('remaining_output',self.execute(remained_neuron))
+                self.execute(remained_neuron)
+        print('remained :', remaining_neurons)
 
 #neurons reset
         for n in self.input_neurons + self.output_neurons + self.neurons + self.controls:
@@ -127,9 +128,10 @@ class individual:
 
 if __name__ == '__main__':
     from chromosome import chromosome
-    chr = chromosome(3,2,(0.01,0.01,0.49,0.49),0.2,0.3)
+    chr = chromosome(3,2,(0.01,0.01,0.49,0.49),0,0)
     for _ in range(10):
         chr.add_connection()
+    chr.generate_graph()
     print(chr.connections)
     ind = individual(chr,0.)
     print(ind.process([0,1,2]))
