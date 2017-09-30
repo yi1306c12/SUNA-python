@@ -68,13 +68,11 @@ if __name__ == '__main__':
     from chromosome import chromosome
     chrs = [chromosome(3,3,(.2,.2,.3,.3),0,0) for _ in range(100)]
 
+    nmap = novelty_map(10)
     import random
     for chr in chrs:
-        chr.mutation(100)
+        chr.mutation(5)
         chr.make_spectrum()
         chr.fitness = random.random()
-
-    nmap = novelty_map(10)
-    for chr in chrs:
         print(nmap.add_node(chr))
 

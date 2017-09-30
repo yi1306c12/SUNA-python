@@ -9,6 +9,8 @@ firing_rate_levels = [1,7,49]
 
 import networkx as nx
 import matplotlib.pyplot as plt
+from copy import deepcopy
+import numpy
 
 class chromosome:
     def __init__(self, n_inputs, n_outputs, M_pa, neuromodulation_probability, control_neuron_probability):
@@ -30,13 +32,14 @@ class chromosome:
     def mutation(self,steps, mutation_probability = None):
         #in > python 3.6
         #random.choices(operations,weights=mutation_probability)
-        import numpy
         operations = [self.add_neuron, self.delete_neuron, self.add_connection, self.delete_connection]
         if mutation_probability is None:
             mutation_probability = self.M_pa
         for _ in range(steps):
             numpy.random.choice(operations, p=mutation_probability)()#operation at random
 
+        self.make_spectrum()
+        return deepcopy(self)
 
     def find_smallest_id(self, neurons_list):
         #find smallest id not used
@@ -152,10 +155,19 @@ class chromosome:
         pos = nx.spring_layout(network)
         nx.draw(network, pos ,with_labels=True,node_color=node_colors,)
         #nx.draw_networkx_edge_labels(network,pos)
-        plt.show()       
+        plt.show()             
 
 
 if __name__ == '__main__':
+    chrs = [chromosome(3,3,(.2,.2,.3,.3),0,0) for _ in range(10)]
+    children = [c.mutation(10) for c in chrs]
+    print(chrs[0].inputs)
+    print(children)
+    print(children[0].inputs)
+    import sys
+    sys.exit(0)
+
+
     a,b = [chromosome(3,3,(.2,.2,.3,.3),0,0) for _ in range(2)]
     a.make_spectrum()
     print(a.spectrum)
