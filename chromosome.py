@@ -10,7 +10,6 @@ firing_rate_levels = [1,7,49]
 import networkx as nx
 import matplotlib.pyplot as plt
 from copy import deepcopy
-import numpy
 
 class chromosome:
     def __init__(self, n_inputs, n_outputs, M_pa, neuromodulation_probability, control_neuron_probability):
@@ -35,8 +34,9 @@ class chromosome:
         operations = [self.add_neuron, self.delete_neuron, self.add_connection, self.delete_connection]
         if mutation_probability is None:
             mutation_probability = self.M_pa
-        for _ in range(steps):
-            numpy.random.choice(operations, p=mutation_probability)()#operation at random
+
+        for operation in random.choices(operations,weights=mutation_probability,k=steps):
+            operation()
 
         self.make_spectrum()
         return deepcopy(self)
