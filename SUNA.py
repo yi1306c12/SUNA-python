@@ -6,7 +6,7 @@ from chromosome import chromosome
 
 class SUNA:
     def __init__(self, number_of_inputs, number_of_outputs,
-        initial_mutations = 200, step_mutations = 5, populatio_size = 100, novelty_map_population = 20, mutation_probability_array = (.01,.01,.49,.49),
+        initial_mutations = 200, step_mutations = 5, populatio_size = 100, maximum_novelty_map_population = 20, mutation_probability_array = (.01,.01,.49,.49),
         neuromodulation_probability = .1, control_neuron_probability = .2, excitation_threshold = 0):
         """
         initial_mutations                   :
@@ -23,18 +23,20 @@ class SUNA:
         assert len(mutation_probability_array) == 4, "mutation_probability_array(M_pa) length must be 4"
         assert all([0 <= probability <= 1 for probability in list(mutation_probability_array)+[neuromodulation_probability, control_neuron_probability]), "Probability must be 0 <= prob <= 1"
 
+        self.novelty_map_size = maximum_novelty_map_population
+
         #first generation
         self.population = [chromosome(number_of_inputs, number_of_outputs, mutation_probability_array).mutation(initial_mutations) for _ in range(population_size)]
 
 
     def generate_individuals(self):
-        nov_map = novelty_map()
+        nov_map = novelty_map(self.novelty_map_size)
 
         for gene in self.population:
             ind = individual(gene)
             yield ind
             gene.fitness = ind.fitness
-            nov_map.append(gene)
+            nov_map.add_node(gene)
 
         self.mutation(nov_map.nodes())
 

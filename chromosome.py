@@ -79,7 +79,7 @@ class chromosome:
         connections_lists = [self.connections, self.control_connections]
         for c_list in connections_lists:
             for c in c_list:
-                if c.from_neuron == delete.id or c.to_neuron == delete.id or c.modulation == delete.id:
+                if c.from_neuron_id == delete.id or c.to_neuron_id == delete.id or c.modulation == delete.id:
                     c_list.remove(c)
 
 
