@@ -42,7 +42,7 @@ class SUNA:
             gene.fitness = ind.fitness
             nov_map.add_node(gene)
 
-        self.mutation(nov_map.nodes())
+        self.mutation(list(nov_map.nodes()))
 
     def mutation(self,selected):
         #roullete choice
@@ -69,6 +69,7 @@ if __name__ == '__main__':
             accum_reward = 0
             observation, reward = env.reset(),0
             for s in range(steps):
+                print(s,end=',')
                 action = ind.process(observation)
                 observation, reward, done, info = env.step(action)
                 accum_reward += reward

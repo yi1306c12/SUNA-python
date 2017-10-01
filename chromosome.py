@@ -69,20 +69,21 @@ class chromosome:
             self.neurons.append(new)
 
     def delete_neuron(self):
-        if len(self.neurons + self.control_neurons) == 0:
+        removable_neurons = self.neurons+self.control_neurons
+        if len(removable_neurons) == 0:
             return#guard
 
-        delete = random.choice(self.neurons + self.control_neurons)
-        for n_list in [self.neurons, self.control_neurons]:
-            if delete in n_list:
-                n_list.remove(delete)
-                break
+        delete_num = random.choice(list(range(len(removable_neurons))))
+        deleted_id = removable_neurons[delete_num].id
+        del removable_neurons[delete_num]
+        print('remove_neuron',len(removable_neurons),len(self.neurons+self.control_neurons))
+        
         #delete all connections relate the deleted neuron
-        connections_lists = [self.connections, self.control_connections]
-        for c_list in connections_lists:
-            for c in c_list:
-                if c.from_neuron_id == delete.id or c.to_neuron_id == delete.id or c.modulation == delete.id:
-                    c_list.remove(c)
+        def new_connection_list(original_list):
+            return [c for c in original_list if c.from_neuron_id==deleted_id or c.to_neuron_id==deleted_id or c.modulation==deleted_id]
+        self.connections = new_connection_list(self.connections)
+        self.control_connections = new_connection_list(self.control_connections)
+        
 
 
     def add_connection(self):
