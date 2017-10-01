@@ -21,11 +21,11 @@ class novelty_map(nx.Graph):
         assert hasattr(new_node, 'fitness'), "node must have fitness"
         assert hasattr(new_node, 'distance'), "node must be able to calculate distance to other node"
 
-        current_nodes = self.nodes()
+        current_nodes = list(self.nodes())
         new_distances = [new_node.distance(n) for n in current_nodes]
 
         #if map is not full
-        if len(self) < self.max_size:
+        if len(self.nodes()) < self.max_size:
             super().add_node(new_node)
             self.add_weighted_edges_from([(new_node,n,dist) for n,dist in zip(current_nodes,new_distances)])
             return True
@@ -42,7 +42,7 @@ class novelty_map(nx.Graph):
             return True
 
         #else if new node is superior to closest node
-        closest_node = self.nodes()[argmin(new_distances)]
+        closest_node = current_nodes[argmin(new_distances)]
         if closest_node.fitness < new_node.fitness:
             self.remove_node(closest_node)
             current_nodes.remove(closest_node)

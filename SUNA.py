@@ -29,7 +29,8 @@ class SUNA:
         self.excitation_threshold = excitation_threshold
 
         #first generation
-        self.population = [chromosome(number_of_inputs, number_of_outputs, mutation_probability_array, neuromodulation_probability, control_neuron_probability).mutation(initial_mutations) for _ in range(population_size)]
+        ancestor = chromosome(number_of_inputs, number_of_outputs, mutation_probability_array, neuromodulation_probability, control_neuron_probability)
+        self.population = [ancestor.mutation(initial_mutations) for _ in range(population_size)]
 
 
     def generate_individuals(self):
@@ -54,12 +55,17 @@ if __name__ == '__main__':
     env = gym.make('Pendulum-v0')
     inputs = env.observation_space.shape[0]
 
-    suna = SUNA(inputs,1)
+    suna = SUNA(inputs,1,maximum_novelty_map_population=10)
+    print('suna')
 
     iteration = 10
     steps = 100
+    t = 0
     for g in range(iteration):
+        print('generation :',g)
         for ind in suna.generate_individuals():
+            print(t)
+            t += 1
             accum_reward = 0
             observation, reward = env.reset(),0
             for s in range(steps):

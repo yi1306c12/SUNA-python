@@ -28,18 +28,17 @@ class chromosome:
         self.control_connections = []
 
 
-    def mutation(self,steps, mutation_probability = None):
-        #in > python 3.6
-        #random.choices(operations,weights=mutation_probability)
-        operations = [self.add_neuron, self.delete_neuron, self.add_connection, self.delete_connection]
+    def mutation(self, steps, mutation_probability = None):
+        new = deepcopy(self)
+        operations = [new.add_neuron, new.delete_neuron, new.add_connection, new.delete_connection]
         if mutation_probability is None:
-            mutation_probability = self.M_pa
+            mutation_probability = new.M_pa
 
         for operation in random.choices(operations,weights=mutation_probability,k=steps):
             operation()
 
-        self.make_spectrum()
-        return deepcopy(self)
+        new.make_spectrum()
+        return new
 
     def find_smallest_id(self, neurons_list):
         #find smallest id not used
@@ -74,7 +73,7 @@ class chromosome:
             return#guard
 
         delete = random.choice(self.neurons + self.control_neurons)
-        for n_list in (self.neurons, self.control_neurons):
+        for n_list in [self.neurons, self.control_neurons]:
             if delete in n_list:
                 n_list.remove(delete)
                 break
