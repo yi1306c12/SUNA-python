@@ -76,8 +76,3 @@ if __name__ == '__main__':
             reward_list.append(accum_reward)
         all_reward_list.append(reward_list)
         print(max(reward_list))
-
-
-
-
-    #print result
