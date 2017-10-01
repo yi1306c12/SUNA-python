@@ -116,7 +116,7 @@ class individual:
         for remained_neuron in remaining_neurons:
             if remained_neuron in self.output_neurons:
                 self.execute(remained_neuron)
-        print('remained :', remaining_neurons)
+#        print('remained :', remaining_neurons)
 
 #neurons reset
         for n in self.input_neurons + self.output_neurons + self.neurons + self.controls:

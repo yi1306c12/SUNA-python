@@ -50,12 +50,26 @@ class SUNA:
 
 
 if __name__ == '__main__':
-    suna = SUNA(2,2)
+    import gym
+    env = gym.make('Pendulum-v0')
+    inputs = env.observation_space.shape[0]
+
+    suna = SUNA(inputs,1)
 
     iteration = 10
+    steps = 100
     for g in range(iteration):
         for ind in suna.generate_individuals():
-            ind.fitness = random.random()
+            accum_reward = 0
+            observation, reward = env.reset(),0
+            for s in range(steps):
+                action = ind.process(observation)
+                observation, reward, done, info = env.step(action)
+                accum_reward += reward
+                if done:
+                    break
+            ind.fitness = accum_reward
+
 
 
     #print result
