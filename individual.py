@@ -26,11 +26,6 @@ class individual:
 
         self.all_neurons = self.input_neurons + self.output_neurons + self.neurons + self.controls
         self.neuron_dict = {n.id:n for n in self.all_neurons}#id dict
-        print(self.neuron_dict)
-
-        #debug
-        for c in self.connections:
-            print(c.from_neuron_id,c.to_neuron_id,c.modulation)
 
 
     def execute(self, neuron, addition=0.):

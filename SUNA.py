@@ -56,26 +56,27 @@ if __name__ == '__main__':
     inputs = env.observation_space.shape[0]
 
     suna = SUNA(inputs,1,maximum_novelty_map_population=10)
-    print('suna')
 
-    iteration = 10
+    iteration = 200
     steps = 100
-    t = 0
+    all_reward_list = []
     for g in range(iteration):
         print('generation :',g)
+        reward_list = []
         for ind in suna.generate_individuals():
-            print(t)
-            t += 1
             accum_reward = 0
             observation, reward = env.reset(),0
             for s in range(steps):
-                print(s,end=',')
                 action = ind.process(observation)
                 observation, reward, done, info = env.step(action)
                 accum_reward += reward
                 if done:
                     break
             ind.fitness = accum_reward
+            reward_list.append(accum_reward)
+        all_reward_list.append(reward_list)
+        print(max(reward_list))
+
 
 
 

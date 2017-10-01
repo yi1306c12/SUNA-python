@@ -76,7 +76,6 @@ class chromosome:
         delete_num = random.choice(list(range(len(removable_neurons))))
         deleted_id = removable_neurons[delete_num].id
         del removable_neurons[delete_num]
-        print('remove_neuron',len(removable_neurons),len(self.neurons+self.control_neurons))
         
         #delete all connections relate the deleted neuron
         def new_connection_list(original_list):
