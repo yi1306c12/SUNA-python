@@ -5,6 +5,7 @@ from individual import individual
 
 import random #choices
 from copy import deepcopy
+import math #isnan
 
 class SUNA:
     def __init__(self, number_of_inputs, number_of_outputs,
@@ -36,33 +37,41 @@ class SUNA:
 
     def generate_individuals(self):
         nov_map = novelty_map(self.novelty_map_size)
+        survives = []
 
         for gene in self.population:
             ind = individual(gene,self.excitation_threshold)
             yield ind
+            #exclude fitness:nan
+            if math.isnan(ind.fitness):
+                continue
+            #add survives
             gene.fitness = ind.fitness
+            survives.append(gene)
             nov_map.add_node(gene)
 
+        self.mutation(self.select_parents(survives, list(nov_map.nodes())))
 
-        self.mutation(self.select_parents(list(nov_map.nodes())))
 
     def mutation(self,selected):
         #roullete choice
-        children = [child.mutation(self.step_mutations) for child in random.choices(selected,k=len(self.population) - len(selected))]
+        children = [parent.mutation(self.step_mutations) for parent in random.choices(selected,k=len(self.population) - len(selected))]
         self.population = selected + children
 
-    def select_parents(self, subpops):
+
+    def select_parents(self, survives, subpops):
         #i can write much better
         #first sort then compare
         representatives = deepcopy(subpops)
-        for p in self.population:
+        for p in survives:
             #decide subpop
             distances = list(map(p.distance, subpops))
             subpop_index = distances.index(min(distances))
             #compare
             if representatives[subpop_index].fitness < p.fitness:
                 representatives[subpop_index] = p
-
+        from statistics import mean
+        print(mean([p.fitness for p in survives]),mean([r.fitness for r in representatives]))
         return representatives
 
 
@@ -93,4 +102,4 @@ if __name__ == '__main__':
             ind.fitness = accum_reward
             reward_list.append(accum_reward)
         all_reward_list.append(reward_list)
-        print(max(reward_list))
+        print('generation_max :',max(reward_list))
