@@ -1,9 +1,10 @@
 #!/usr/env/bin python3
-from novelty_map_forSUNA import novelty_map
+from novelty_map import novelty_map
 from chromosome import chromosome
 from individual import individual
 
 import random #choices
+from copy import deepcopy
 
 class SUNA:
     def __init__(self, number_of_inputs, number_of_outputs,
@@ -42,12 +43,29 @@ class SUNA:
             gene.fitness = ind.fitness
             nov_map.add_node(gene)
 
-        self.mutation(list(nov_map.nodes()))
+
+        self.mutation(self.select_parents(list(nov_map.nodes())))
 
     def mutation(self,selected):
         #roullete choice
         children = [child.mutation(self.step_mutations) for child in random.choices(selected,k=len(self.population) - len(selected))]
         self.population = selected + children
+
+    def select_parents(self, subpops):
+        #i can write much better
+        #first sort then compare
+        representatives = deepcopy(subpops)
+        for p in self.population:
+            #decide subpop
+            distances = list(map(p.distance, subpops))
+            subpop_index = distances.index(min(distances))
+            #compare
+            if representatives[subpop_index].fitness < p.fitness:
+                representatives[subpop_index] = p
+
+        return representatives
+
+
 
 
 if __name__ == '__main__':

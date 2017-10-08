@@ -9,31 +9,27 @@ def get_edge_distance(edge):
 
 
 class novelty_map(nx.Graph):
-
+    
     def __init__(self,max_size):
         assert max_size > 0, "novelty_map size must be > 0"
         self.max_size = max_size
         super().__init__()
     
-
-    new_distances = []
     def add_node(self, new_node):
-        assert hasattr(new_node, 'fitness'), "node must have fitness"
-        assert hasattr(new_node, 'distance'), "node must be able to calculate distance to other node"
+        assert hasattr(new_node, 'distance'), "node must be able to calculate distance to an other"
 
         current_nodes = list(self.nodes())
-        new_distances = [new_node.distance(n) for n in current_nodes]
+        new_node_distances = [new_node.distance(n) for n in current_nodes]
 
         #if map is not full
-        if len(self.nodes()) < self.max_size:
+        if len(current_nodes) < self.max_size:
             super().add_node(new_node)
-            self.add_weighted_edges_from([(new_node,n,dist) for n,dist in zip(current_nodes,new_distances)])
+            self.add_weighted_edges_from([(new_node, n, dist) for n,dist in zip(current_nodes, new_node_distances)])
             return True
-        
+
         #else if worst_node closer than new_node
-        current_min_edge = self.get_minimum_edge()
-        current_min_distance = get_edge_distance(current_min_edge)
-        if current_min_distance < min(new_distances):
+        current_min_edge = self.get_minimum_edge()      
+        if get_edge_distance(current_min_edge) < min(new_distances):
             worst_node = self.get_worse_node_from_edge(current_min_edge)
             self.remove_node(worst_node)#whichever you like (0 or 1)
             current_nodes.remove(worst_node)#care about the removed node
@@ -41,15 +37,6 @@ class novelty_map(nx.Graph):
             self.add_weighted_edges_from([(new_node,n,new_node.distance(n)) for n in current_nodes])#care about the removed node
             return True
 
-        #else if new node is superior to closest node
-        closest_node = current_nodes[argmin(new_distances)]
-        if closest_node.fitness < new_node.fitness:
-            self.remove_node(closest_node)
-            current_nodes.remove(closest_node)
-            super().add_node(new_node)
-            self.add_weighted_edges_from([(new_node,n,new_node.distance(n)) for n in current_nodes])#care about the removed node
-            return True
-        
         #else
         return False
 
@@ -75,4 +62,3 @@ if __name__ == '__main__':
         chr.make_spectrum()
         chr.fitness = random.random()
         print(nmap.add_node(chr))
-
