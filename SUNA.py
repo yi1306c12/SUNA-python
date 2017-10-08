@@ -52,13 +52,13 @@ class SUNA:
 
 if __name__ == '__main__':
     import gym
-    env = gym.make('Pendulum-v0')
+    env = gym.make('CartPole-v1')
     inputs = env.observation_space.shape[0]
 
     suna = SUNA(inputs,1,maximum_novelty_map_population=10)
 
     iteration = 200
-    steps = 100
+    steps = 500
     all_reward_list = []
     for g in range(iteration):
         print('generation :',g)
@@ -67,11 +67,13 @@ if __name__ == '__main__':
             accum_reward = 0
             observation, reward = env.reset(),0
             for s in range(steps):
-                action = ind.process(observation)
+                action = int(ind.process(observation)[0] > 0)#cartpole
                 observation, reward, done, info = env.step(action)
                 accum_reward += reward
                 if done:
                     break
+                env.render()
+            print(accum_reward)
             ind.fitness = accum_reward
             reward_list.append(accum_reward)
         all_reward_list.append(reward_list)
