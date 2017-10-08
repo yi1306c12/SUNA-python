@@ -69,6 +69,29 @@ class output_neuron:
 class output_identity_neuron(output_neuron, identity_neuron):
     pass
 
+
+
+class connection_phenotype:
+    def __init__(self, from_neuron, to_neuron, weight):
+        assert isinstance(from_neuron, neuron) and isinstance(to_neuron, neuron), "to_neuron & from_neuron must be neuron"
+        self.from_neuron = from_neuron
+        self.to_neuron = to_neuron
+        self.weight = weight
+
+    def __call__(self):
+        return self.weight*self.from_neuron.get_internal_state()
+        
+
+class modulated_connection(connection_phenotype):
+    def __init__(self, from_neuron, to_neuron, modulator_neuron, threshold):
+        self.modulator_neuron = modulator_neuron
+        self.threshold = threshold
+        super().__init__(from_neuron, to_neuron, 0.)
+
+    def __call__(self):
+        modulator_input = self.modulator_neuron.get_internal_state() if self.modulator_neuron.excitation >= self.threshold else 0.
+        return modulator_input*self.from_neuron.get_internal_state()
+    
     
 if __name__ == "__main__":
     #test input_neuron
