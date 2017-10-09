@@ -1,7 +1,7 @@
 import random
 from functools import reduce
-from neurons import identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron,input_identity_neuron,output_identity_neuron,control_neuron
-from gene import neuron_gene, connection_gene
+from phenotype import identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron,input_identity_neuron,output_identity_neuron,control_neuron
+from genotype import neuron_gene, connection_gene
 
 
 normal_neurons = [identity_neuron,sigmoid_neuron,random_neuron,threshold_neuron]
