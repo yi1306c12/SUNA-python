@@ -41,7 +41,6 @@ class individual:
         from_control_connections = [conn for conn in self.connections if conn.from_neuron in self.controls]
         self.nonprimer_neurons = list(set([conn.to_neuron for conn in from_control_connections if conn.to_neuron in self.controls]))
         self.primer_neurons = list(set(self.controls) - set(self.nonprimer_neurons))
-#        print(len(self.nonprimer_neurons),len(self.primer_neurons))
 
 
     def execute(self, to_neuron, addition=0.):
