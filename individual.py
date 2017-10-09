@@ -36,6 +36,7 @@ class individual:
         self.from_control_dict = {from_control_neuron
             : [conn for conn in phenotype_connections if conn.from_neuron is from_control_neuron]#from control_neuron connections
             for from_control_neuron in self.controls}
+#        print('conn :',len(phenotype_connections),sum([len(conn) for conn in list(self.source_dict.values()) + list(self.from_control_dict.values())]))
 
         #make primer list
         from_control_connections = [conn for conn in phenotype_connections if conn.from_neuron in self.controls]
