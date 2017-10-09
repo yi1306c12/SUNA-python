@@ -87,6 +87,7 @@ if __name__ == '__main__':
             for s in range(steps):
                 action = int(ind.process(observation)[0] > 0)#cartpole
                 observation, reward, done, info = env.step(action)
+#                observation, reward, done, info = env.step(0)#debug
                 accum_reward += reward
                 if done:
                     break

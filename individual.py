@@ -20,12 +20,14 @@ class individual:
 
         #make connections
         self.connections = []
-        for c in chromosome.connections:
-            if c.modulation < 0:
-                pc = connection_phenotype(neuron_dict[c.from_neuron_id], neuron_dict[c.to_neuron_id], c.weight)
+        for genotype_conn in chromosome.connections:
+            from_neuron = neuron_dict[genotype_conn.from_neuron_id]
+            to_neuron = neuron_dict[genotype_conn.to_neuron_id]
+            if genotype_conn.modulation < 0:
+                phenotype_conn = connection_phenotype(from_neuron, to_neuron, genotype_conn.weight)
             else:
-                pc = modulated_connection(neuron_dict[c.from_neuron_id], neuron_dict[c.to_neuron_id], neuron_dict[c.modulation], self.EXCITATION_THRESHOLD)
-            self.connections.append(pc)
+                phenotype_conn = modulated_connection(from_neuron, to_neuron, neuron_dict[genotype_conn.modulation], self.EXCITATION_THRESHOLD)
+            self.connections.append(phenotype_conn)
 
         #execute preparation
         self.source_dict = {to_neuron
@@ -39,6 +41,7 @@ class individual:
         from_control_connections = [conn for conn in self.connections if conn.from_neuron in self.controls]
         self.nonprimer_neurons = list(set([conn.to_neuron for conn in from_control_connections if conn.to_neuron in self.controls]))
         self.primer_neurons = list(set(self.controls) - set(self.nonprimer_neurons))
+#        print(len(self.nonprimer_neurons),len(self.primer_neurons))
 
 
     def execute(self, to_neuron, addition=0.):
@@ -97,6 +100,7 @@ class individual:
 #        print('remained :', remaining_neurons)
 
 #neurons reset
+#        print('excitation :',sum([n.excitation for n in self.input_neurons+self.output_neurons+self.neurons+self.controls]))
         for n in self.input_neurons + self.output_neurons + self.neurons + self.controls:
             n.excitation = 0.
 
