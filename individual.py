@@ -1,4 +1,5 @@
-from neurons import control_neuron
+from phenotype import control_neuron, modulated_connection, connection_phenotype
+
 
 class individual:
     #parameter
@@ -14,63 +15,40 @@ class individual:
         self.neurons = [n.generate_phenotype() for n in chromosome.neurons]
         self.controls = [cn.generate_phenotype() for cn in chromosome.control_neurons]
 
-        self.connections = chromosome.connections
+        all_neurons = self.input_neurons + self.output_neurons + self.neurons + self.controls
+        neuron_dict = {n.id:n for n in all_neurons}#id dict
+
+        #make connections
+        self.connections = []
+        for c in chromosome.connections:
+            if c.modulation < 0:
+                pc = connection_phenotype(neuron_dict[c.from_neuron_id], neuron_dict[c.to_neuron_id], c.weight)
+            else:
+                pc = modulated_connection(neuron_dict[c.from_neuron_id], neuron_dict[c.to_neuron_id], neuron_dict[c.modulation], self.EXCITATION_THRESHOLD)
+            self.connections.append(pc)
+
+        #execute preparation
+        self.source_dict = {to_neuron
+            : [conn for conn in self.connections if conn.to_neuron is to_neuron and not isinstance(conn.from_neuron,control_neuron)]#no controls
+            for to_neuron in all_neurons}
+        self.from_control_dict = {from_control_neuron
+            : [conn for conn in self.connections if conn.from_neuron is from_control_neuron]#from control_neuron connections
+            for from_control_neuron in self.controls}
 
         #make primer list
-        control_ids = [cn.id for cn in self.controls]
-        from_control_connections = [conn for conn in self.connections if conn.from_neuron_id in control_ids]
-        nonprimer_ids = set([conn.to_neuron_id for conn in from_control_connections if conn.to_neuron_id in control_ids])
-        primer_ids = set(control_ids) - nonprimer_ids
-        self.nonprimer_neurons = [cn for cn in self.controls if cn.id in nonprimer_ids]
-        self.primer_neurons = [cn for cn in self.controls if cn.id in primer_ids]
-
-        self.all_neurons = self.input_neurons + self.output_neurons + self.neurons + self.controls
-        self.neuron_dict = {n.id:n for n in self.all_neurons}#id dict
+        from_control_connections = [conn for conn in self.connections if conn.from_neuron in self.controls]
+        self.nonprimer_neurons = list(set([conn.to_neuron for conn in from_control_connections if conn.to_neuron in self.controls]))
+        self.primer_neurons = list(set(self.controls) - set(self.nonprimer_neurons))
 
 
-    def execute(self, neuron, addition=0.):
-        all_input_sum = 0.
-
-        for connection in self.connections:
-            #is input to this neuron?
-            if connection.to_neuron_id != neuron.id : continue#guard
-
-            #is not control_neuron?
-            source_neuron = self.neuron_dict[connection.from_neuron_id]
-            if isinstance(source_neuron, control_neuron) : continue#guard
-
-            #no modulation
-            if connection.modulation < 0:
-#                print('input from', source_neuron.id, source_neuron.get_internal_state())
-                _input = connection.weight * source_neuron.get_internal_state()
-            #neuromodulation
-            else:
-                modulator_neuron = self.neuron_dict[connection.modulation]
-                modulator_input = modulator_neuron.get_internal_state() if modulator_neuron.excitation >= self.EXCITATION_THRESHOLD else 0.
-                _input = modulator_input * source_neuron.get_internal_state()
-
-            all_input_sum += _input
-
-        #update internal state
-#        print(neuron.id,all_input_sum)
-        return neuron(all_input_sum + addition)
+    def execute(self, to_neuron, addition=0.):
+        return sum([conn() for conn in self.source_dict[to_neuron]]) + addition
 
 
-    def control_execute(self, neuron):
-        for connection in self.connections:
-            #is excited by this control neuron?
-            if connection.from_neuron_id != neuron.id : continue#guard
-            
-            destination_neuron = self.neuron_dict[connection.to_neuron_id]
-            #no modulation
-            if connection.modulation < 0:
-                destination_neuron.excitation += connection.weight*neuron.get_internal_state()
-            #neuromodulation
-            else:
-                modulator_neuron = self.neuron_dict[connection.modulation]
-                modulator_input = modulator_neuron.get_internal_state() if modulator_neuron.excitation >= self.EXCITATION_THRESHOLD else 0.
-                destination_neuron.excitation += modulator_input * neuron.get_internal_state()
-        
+    def control_execute(self, from_control_neuron):
+        for connection in self.from_control_dict[from_control_neuron]:
+            connection.to_neuron.excitation += connection()
+
 
     def process(self, observation):
         assert len(self.input_neurons) == len(observation), "invalid input length {}->{}".format(len(observation),len(self.input_neurons))
