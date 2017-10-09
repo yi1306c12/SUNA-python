@@ -19,7 +19,7 @@ class individual:
         neuron_dict = {n.id:n for n in all_neurons}#id dict
 
         #make connections
-        self.connections = []
+        phenotype_connections = []
         for genotype_conn in chromosome.connections:
             from_neuron = neuron_dict[genotype_conn.from_neuron_id]
             to_neuron = neuron_dict[genotype_conn.to_neuron_id]
@@ -27,18 +27,18 @@ class individual:
                 phenotype_conn = connection_phenotype(from_neuron, to_neuron, genotype_conn.weight)
             else:
                 phenotype_conn = modulated_connection(from_neuron, to_neuron, neuron_dict[genotype_conn.modulation], self.EXCITATION_THRESHOLD)
-            self.connections.append(phenotype_conn)
+            phenotype_connections.append(phenotype_conn)
 
         #execute preparation
         self.source_dict = {to_neuron
-            : [conn for conn in self.connections if conn.to_neuron is to_neuron and not isinstance(conn.from_neuron,control_neuron)]#no controls
+            : [conn for conn in phenotype_connections if conn.to_neuron is to_neuron and not isinstance(conn.from_neuron,control_neuron)]#no controls
             for to_neuron in all_neurons}
         self.from_control_dict = {from_control_neuron
-            : [conn for conn in self.connections if conn.from_neuron is from_control_neuron]#from control_neuron connections
+            : [conn for conn in phenotype_connections if conn.from_neuron is from_control_neuron]#from control_neuron connections
             for from_control_neuron in self.controls}
 
         #make primer list
-        from_control_connections = [conn for conn in self.connections if conn.from_neuron in self.controls]
+        from_control_connections = [conn for conn in phenotype_connections if conn.from_neuron in self.controls]
         self.nonprimer_neurons = list(set([conn.to_neuron for conn in from_control_connections if conn.to_neuron in self.controls]))
         self.primer_neurons = list(set(self.controls) - set(self.nonprimer_neurons))
 
