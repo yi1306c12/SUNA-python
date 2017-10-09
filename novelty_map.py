@@ -29,7 +29,7 @@ class novelty_map(nx.Graph):
 
         #else if worst_node closer than new_node
         current_min_edge = self.get_minimum_edge()      
-        if get_edge_distance(current_min_edge) < min(new_distances):
+        if get_edge_distance(current_min_edge) < min(new_node_distances):
             worst_node = self.get_worse_node_from_edge(current_min_edge)
             self.remove_node(worst_node)#whichever you like (0 or 1)
             current_nodes.remove(worst_node)#care about the removed node
